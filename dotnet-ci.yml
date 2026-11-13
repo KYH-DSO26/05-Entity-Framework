@@ -1,0 +1,20 @@
+# Skapa filen .github/workflows/dotnet-ci.yml i ditt repo och kör git push!
+name: FailSafeRentals CI
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  build-and-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 11
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '11.0.x'
+      - name: Build Release & Generate SQL Script
+        run: |
+          dotnet build --configuration Release
+          dotnet tool install --global dotnet-ef
+          dotnet ef migrations script --idempotent -o release-migration.sql
+
